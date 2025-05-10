@@ -3,28 +3,28 @@ name: Auto PR from dev to main
 on:
   push:
     branches:
-      - dev  # Trigger only when changes are pushed to dev
+      - dev
 
 jobs:
   create-pr:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create Pull Request
+      - name: Create PR from dev to main
         id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: dev
-          base: main
-          title: 'Auto PR from dev to main'
-          body: 'This PR is automatically created when changes are pushed to the dev branch.'
+          branch: dev         # This is the source branch
+          base: main          # This is the target branch
+          title: 'Auto PR: dev → main'
+          body: 'This pull request was auto-created on push to dev.'
 
-      - name: Show PR details
-        if: steps.cpr.outputs.pull-request-number != ''
+      - name: Show PR info
+        if: steps.cpr.outputs.pull-request-url != ''
         run: |
-          echo "Pull Request Number: ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL: ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "PR Number: ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "PR URL: ${{ steps.cpr.outputs.pull-request-url }}"
