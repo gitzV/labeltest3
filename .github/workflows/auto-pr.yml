@@ -3,7 +3,7 @@ name: Create PR from dev to main
 on:
   push:
     branches:
-      - dev  # Only triggers on pushes to dev branch
+      - dev
 
 jobs:
   create-pr:
@@ -11,15 +11,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed to see all branches
+
+      - name: Debug branches
+        run: |
+          echo "Current ref: ${{ github.ref }}"
+          git branch -a
+          git log --oneline -n 3
 
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Updates from dev branch"
-          body: "Automated PR containing latest changes from dev"
-          base: main   # Target branch
-          head: dev    # Source branch
+          title: "Dev Updates - ${{ github.sha }}"
+          body: "Automated PR from dev branch\nCommit: ${{ github.sha }}"
+          base: main
+          head: dev
           draft: false
           assignees: ${{ github.actor }}
-          labels: "automated-pr"
+          labels: "automated"
+
+      - name: Show PR result
+        if: always()
+        run: |
+          echo "PR creation status: ${{ steps.create-pr.outputs.result }}"
+          echo "PR number: ${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
