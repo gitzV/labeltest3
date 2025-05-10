@@ -1,41 +1,30 @@
-name: Create PR from dev to main
+name: Auto PR from dev to main
 
 on:
   push:
     branches:
-      - dev
+      - dev  # Trigger only when changes are pushed to dev
 
 jobs:
   create-pr:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Needed to see all branches
 
-      - name: Debug branches
-        run: |
-          echo "Current ref: ${{ github.ref }}"
-          git branch -a
-          git log --oneline -n 3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Create Pull Request
-        id: create-pr
+        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Dev Updates - ${{ github.sha }}"
-          body: "Automated PR from dev branch\nCommit: ${{ github.sha }}"
+          branch: dev
           base: main
-          head: dev
-          draft: false
-          assignees: ${{ github.actor }}
-          labels: "automated"
+          title: 'Auto PR from dev to main'
+          body: 'This PR is automatically created when changes are pushed to the dev branch.'
 
-      - name: Show PR result
-        if: always()
+      - name: Show PR details
+        if: steps.cpr.outputs.pull-request-number != ''
         run: |
-          echo "PR creation status: ${{ steps.create-pr.outputs.result }}"
-          echo "PR number: ${{ steps.create-pr.outputs.pull-request-number }}"
-          echo "PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+          echo "Pull Request Number: ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL: ${{ steps.cpr.outputs.pull-request-url }}"
