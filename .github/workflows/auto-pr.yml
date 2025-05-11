@@ -3,23 +3,33 @@ name: Create PR from dev to main
 on:
   push:
     branches:
-      - dev  # Only triggers on pushes to dev branch
+      - dev
 
 jobs:
   create-pr:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Show GH CLI version (debug)
+        run: gh --version
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Updates from dev branch"
-          body: "Automated PR containing latest changes from dev"
-          base: main
-          branch: dev  # Correct input name
-          draft: false
-          assignees: ${{ github.actor }}
-          labels: "automated-pr"
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head dev \
+            --title "Auto PR: dev to main" \
+            --body "This PR was automatically created."
+            --label "QA"
+
