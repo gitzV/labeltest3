@@ -31,5 +31,5 @@ jobs:
             --head dev \
             --title "Auto PR: dev to main" \
             --body "This PR was automatically created."
-            --labels "QA"
+            --label "QA"
 
