@@ -18,17 +18,6 @@ jobs:
           sudo apt update
           sudo apt install gh -y
 
-      - name: Check if PR already exists
-        id: check
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if gh pr list --base main --head dev --json number --jq '.[0]'; then
-            echo "pr_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "pr_exists=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Create PR from dev to main
         if: steps.check.outputs.pr_exists == 'false'
         env:
