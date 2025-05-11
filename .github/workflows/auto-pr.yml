@@ -30,6 +30,6 @@ jobs:
             --base main \
             --head dev \
             --title "Auto PR: dev to main" \
-            --body "This PR was automatically created."
+            --body "This PR was automatically created."\
             --label "QA"
 
